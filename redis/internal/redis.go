@@ -1,4 +1,4 @@
-package redis_internal
+package redis
 
 import (
 	"sync"

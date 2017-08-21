@@ -15,13 +15,15 @@ const logFormat = `date=%s, method=%s, url=%s,  response_time=%s`
 type Config struct {
 	LogLevel     string
 	ErrorLogPath string
+	AppName      string
 }
 
 var (
 	// DefaultConfig of log
 	DefaultConfig = Config{
 		LogLevel:     "info",
-		ErrorLogPath: "/var/log/transactionapp/transactionapp.error.log",
+		ErrorLogPath: "/var/log",
+		AppName:      "unknown",
 	}
 )
 
@@ -32,9 +34,8 @@ func SetConfig(config Config) {
 		config.LogLevel = DefaultConfig.LogLevel
 	}
 	if config.ErrorLogPath == "" {
-		config.ErrorLogPath = DefaultConfig.ErrorLogPath
+		config.ErrorLogPath = DefaultConfig.ErrorLogPath + fmt.Sprintf("/%s/%s.error.log", config.AppName, config.AppName)
 	}
-
 	SetLevel(config.LogLevel)
 	if f := reopen(1, config.ErrorLogPath); f != nil {
 		logrus.SetOutput(f)

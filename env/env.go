@@ -1,6 +1,9 @@
 package env
 
-import "os"
+import (
+	"errors"
+	"os"
+)
 
 const (
 	EnvDev   = "dev"
@@ -16,8 +19,10 @@ func Get() string {
 	return env
 }
 
-const appname = "transactionapp"
-
-func GetAppName() string {
-	return appname
+func GetAppName() (string, error) {
+	appname := os.Getenv("TXAPPNAME")
+	if appname == "" {
+		return "", errors.New("Application name is empty")
+	}
+	return appname, nil
 }

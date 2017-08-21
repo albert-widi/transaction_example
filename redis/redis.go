@@ -2,7 +2,7 @@ package redis
 
 import (
 	"github.com/albert-widi/transaction_example/errors"
-	"github.com/albert-widi/transaction_example/redis/internal"
+	redi "github.com/albert-widi/transaction_example/redis/internal"
 )
 
 type (
@@ -17,42 +17,37 @@ type (
 	}
 
 	RedisStore struct {
-		redisConn *redis_internal.Redis
+		redisConn *redi.Redis
 		address   string
 	}
 	redis struct {
-		connectedRedis map[redisType]*RedisStore
+		connectedRedis map[RedisType]*RedisStore
 	}
 
 	// type of redis
-	redisType string
+	RedisType string
 )
 
 var redisObject *redis
 
-// const of database type
-const (
-	SessionRedis redisType = "session_redis"
-)
-
 // Init redis connection
 func Init(config Config) {
-	redisObject = &redis{connectedRedis: make(map[redisType]*RedisStore)}
+	redisObject = &redis{connectedRedis: make(map[RedisType]*RedisStore)}
 	for name, conf := range config.Redis {
 		store := RedisStore{
 			address: conf.Address,
 		}
-		store.redisConn = redis_internal.New(conf.Address, redis_internal.NetworkTCP, redis_internal.Options{
+		store.redisConn = redi.New(conf.Address, redi.NetworkTCP, redi.Options{
 			MaxActive: conf.MaxActive,
 			MaxIdle:   conf.MaxIdle,
 			Timeout:   conf.Timeout,
 			Wait:      true,
 		})
-		redisObject.connectedRedis[redisType(name)] = &store
+		redisObject.connectedRedis[RedisType(name)] = &store
 	}
 }
 
-func Get(redisType redisType) (*RedisStore, error) {
+func Get(redisType RedisType) (*RedisStore, error) {
 	if redisConn, ok := redisObject.connectedRedis[redisType]; ok {
 		return redisConn, nil
 	}

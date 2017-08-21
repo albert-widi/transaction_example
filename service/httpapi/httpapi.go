@@ -12,7 +12,8 @@ import (
 
 // Options of
 type Config struct {
-	ListenAddress string
+	ListenAddress  string
+	RouteEndpoints map[string]func(chi.Router)
 }
 
 // Handler struct
@@ -30,8 +31,11 @@ func New(conf Config) *Handler {
 		router: r,
 		birth:  time.Now(),
 	}
-	// grouping the api
-	r.Route("/api/v1", registerAPI())
+	// register all mapped endpoint
+	for endpoint, f := range conf.RouteEndpoints {
+		r.Route(endpoint, f)
+	}
+	// metrics, exporting data for prometheus
 	r.Handle("/metrics", prometheus.Handler())
 	return h
 }
