@@ -5,7 +5,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/albert-widi/transaction_example/cmd/product/productapi"
+	api "github.com/albert-widi/transaction_example/cmd/promo/promoapi"
 	"github.com/albert-widi/transaction_example/log"
 	"github.com/albert-widi/transaction_example/service/httpapi"
 )
@@ -13,8 +13,8 @@ import (
 func main() {
 	fatalChan := make(chan error)
 	w := httpapi.New(httpapi.Config{
-		ListenAddress:  ":9001",
-		RouteEndpoints: productapi.Endpoints,
+		ListenAddress:  ":9002",
+		RouteEndpoints: api.Endpoints,
 	})
 	go func() {
 		if err := w.Run(); err != nil {

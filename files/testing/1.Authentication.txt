@@ -1,0 +1,45 @@
+To create a normal authorized user, use this request:
+
+REQUEST:
+curl -v 'localhost:9300/api/v1/simpleauth'
+
+RESPONSE:
+*   Trying ::1...
+* Connected to localhost (::1) port 9300 (#0)
+> GET /api/v1/simpleauth HTTP/1.1
+> Host: localhost:9300
+> User-Agent: curl/7.49.1
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+< Set-Cookie: _SID_HFDEVTEST_=db986460eef8c141576c06478746fa11; Path=/; Expires=Tue, 10 Jul 2018 19:08:41 GMT
+< Date: Mon, 10 Jul 2017 19:08:41 GMT
+< Content-Length: 18
+< Content-Type: text/plain; charset=utf-8
+<
+* Connection #0 to host localhost left intact
+Success set cookie
+
+-----------------------------------------------------------------------------------
+
+To create an admin authorized user, use this request:
+
+REQUEST:
+curl -v localhost:9000/api/v1/simplelogin?admin=true
+
+RESPONSE:
+*   Trying ::1...
+* Connected to localhost (::1) port 9000 (#0)
+> GET /api/v1/simplelogin?admin=true HTTP/1.1
+> Host: localhost:9000
+> User-Agent: curl/7.49.1
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+< Set-Cookie: _SID_TXNAPP_=6a260fd0429ab7fd6c50b222b067f124; Path=/; Expires=Tue, 21 Aug 2018 16:37:15 GMT
+< Date: Mon, 21 Aug 2017 16:37:15 GMT
+< Content-Length: 18
+< Content-Type: text/plain; charset=utf-8
+<
+* Connection #0 to host localhost left intact
+

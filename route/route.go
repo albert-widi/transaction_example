@@ -102,3 +102,8 @@ func (rwrap *RouterWrapper) Delete(pattern string, h http.HandlerFunc, options .
 func (rwrap *RouterWrapper) HandlePrometheus(pattern string, h http.Handler) {
 	rwrap.r.Handle(pattern, h)
 }
+
+// Param return string value from chi.URLParam
+func Param(r *http.Request, param string) string {
+	return chi.URLParam(r, param)
+}

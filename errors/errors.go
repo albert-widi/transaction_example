@@ -33,6 +33,10 @@ type Errs struct {
 	// Fields is a fields context similar to logrus.Fields
 	// Can be used for adding more context to the errors
 	fields Fields
+
+	// Mask error used to masked unknown error
+	// Useful for request where user do not have to know the exact error
+	maskedErr error
 }
 
 /*
@@ -82,6 +86,12 @@ func (e *Errs) Error() string {
 	return e.err.Error()
 }
 
+// Mask error
+func (e *Errs) Mask(args ...interface{}) *Errs {
+	e.maskedErr = New(args...)
+	return e
+}
+
 // SetMessage for error
 func (e *Errs) SetMessage(message string) {
 	e.message = message
@@ -104,6 +114,10 @@ func (e *Errs) GetTrace() []string {
 // ErrorAndHttpCode can receive error to extract error message and http code
 func ErrorAndHttpCode(err error) (string, int) {
 	if errs, ok := err.(*Errs); ok {
+		// return masked if not nil
+		if errs.maskedErr != nil {
+			return errs.maskedErr.(*Errs).code.GetErrorAndCode()
+		}
 		return errs.code.GetErrorAndCode()
 	}
 	// return internal server error if error is unknown
