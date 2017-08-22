@@ -29,6 +29,14 @@ const (
 	// promo
 	PromoVoucherNotExists // promo voucher is not exists
 	PromoVoucherExpired   // promo voucher is expired
+
+	// shippers
+	ShipperNotExists // shipper is not existss
+	// shipping
+	ShippingIDInvalid       // invalid shipping id
+	ShippingShipperEmpty    // shipping shipper id cannot be 0
+	ShippingAddressEmpty    // shipping address cannot be empty
+	ShippingCannotBeUpdated // shipping cannot be updated because current status is higher
 )
 
 // Get code
@@ -46,14 +54,32 @@ func (c Codes) GetErrorAndCode() (string, int) {
 		return "Redis key duplicate", http.StatusBadRequest
 	case RedisKeyNotFound:
 		return "Redis key is not found", http.StatusBadRequest
+
+	// product
 	case ProductStockEmpty:
 		return "Product stock is empty", http.StatusBadRequest
 	case ProductInvalidAmount:
 		return "Invalid product amount", http.StatusBadRequest
+
+	// promo
 	case PromoVoucherNotExists:
 		return "Promo voucher not exists", http.StatusNotFound
 	case PromoVoucherExpired:
 		return "Promo voucher expired", http.StatusBadRequest
+
+	// shipper
+	case ShipperNotExists:
+		return "Shipper is not exists", http.StatusNotFound
+	//shipping
+	case ShippingIDInvalid:
+		return "Shipping id is invalid", http.StatusBadRequest
+	case ShippingAddressEmpty:
+		return "Shipping address cannot be empty", http.StatusBadRequest
+	case ShippingShipperEmpty:
+		return "Shipping shipper id cannot be 0", http.StatusBadRequest
+	case ShippingCannotBeUpdated:
+		return "Shipping cannot be updated, current status is higher", http.StatusBadRequest
+
 	default:
 		return "Internal server error", http.StatusInternalServerError
 	}

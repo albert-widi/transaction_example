@@ -23,14 +23,14 @@ type Config struct {
 
 // DB of database
 type db struct {
-	connectedDbs map[dbType]*sqlt.DB
+	connectedDbs map[DbType]*sqlt.DB
 }
 
 var dbObject *db
 
 // Init database connection
 func Init(cfg Config) error {
-	dbObject = &db{connectedDbs: make(map[dbType]*sqlt.DB)}
+	dbObject = &db{connectedDbs: make(map[DbType]*sqlt.DB)}
 	for dbName, dsn := range cfg.DSN {
 		var (
 			interval time.Duration
@@ -56,31 +56,26 @@ func Init(cfg Config) error {
 				time.Sleep(interval)
 				continue
 			}
-			dbObject.connectedDbs[dbType(dbName)] = newDB
+			dbObject.connectedDbs[DbType(dbName)] = newDB
 			break
 		}
 	}
 	return nil
 }
 
-// dbType is type of database
-type dbType string
-
-// const of database type
-const (
-	TxDB dbType = "TxDB"
-)
+// DbType is type of database
+type DbType string
 
 // Get database
-func Get(dType dbType) (*sqlt.DB, error) {
+func Get(dType DbType) (*sqlt.DB, error) {
 	if dbConn, ok := dbObject.connectedDbs[dType]; ok {
 		return dbConn, nil
 	}
 	return nil, errors.New(errors.DatabaseTypeNotExists)
 }
 
-// GetFatal database
-func GetFatal(dType dbType) *sqlt.DB {
+// MustGet database will cause fatal is database is not exists
+func MustGet(dType DbType) *sqlt.DB {
 	if dbConn, ok := dbObject.connectedDbs[dType]; ok {
 		return dbConn
 	}

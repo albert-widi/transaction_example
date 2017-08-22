@@ -4,7 +4,7 @@ build_auth:
 
 start_auth:
 	@echo " >> starting auth service"
-	@./authapp -appname=authapp -log_level=debug
+	@TXAPPNAME=authapp  ./authapp -log_level=debug
 
 build_product:
 	@echo " >> building product service binary"
@@ -12,7 +12,7 @@ build_product:
 
 start_product:
 	@echo " >> starting product service"
-	@./productapp -appname=productapp -log_level=debug
+	@TXAPPNAME=productapp ./productapp -appname=productapp -log_level=debug
 
 build_promo:
 	@echo " >> building promo service binary"
@@ -20,4 +20,12 @@ build_promo:
 
 start_promo:
 	@echo " >> starting promo service"
-	@./promoapp -appname=promoapp -log_level=debug
+	@TXAPPNAME=promoapp ./promoapp -log_level=debug
+
+build_logistic:
+	@echo " >> building logistic service binary"
+	@go build -o logisticapp cmd/logistic/*.go
+
+start_logistic:
+	@echo " >> starting logistic service"
+	@TXAPPNAME=logisticapp ./logisticapp -log_level=debug

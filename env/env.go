@@ -19,6 +19,8 @@ func Get() string {
 	return env
 }
 
+// GetAppName will return application name
+// this is important, since many package using app name to set metrics or log
 func GetAppName() (string, error) {
 	appname := os.Getenv("TXAPPNAME")
 	if appname == "" {
