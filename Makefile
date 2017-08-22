@@ -1,3 +1,9 @@
+build:
+	make build_auth
+	make build_product
+	make build_promo
+	make build_logistic
+
 build_auth:
 	@echo " >> building auth service binary"
 	@go build -o authapp cmd/auth/*.go

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"errors"
 	"flag"
 
 	"github.com/albert-widi/transaction_example/config"
+	"github.com/albert-widi/transaction_example/env"
 	"github.com/albert-widi/transaction_example/log"
 	"github.com/albert-widi/transaction_example/redis"
 )
@@ -24,7 +24,6 @@ var directories = []string{
 
 // variables for CLI
 var (
-	appName      = flag.String("appname", "", "set application name")
 	logLevel     = flag.String("log_level", "info", "set log level")
 	errorLogPath = flag.String("error_log", "", "log path")
 )
@@ -35,17 +34,18 @@ func ApplicationConfig() (AppConfig, error) {
 		l: log.Config{
 			LogLevel:     *logLevel,
 			ErrorLogPath: *errorLogPath,
-			AppName:      *appName,
 		},
 	}
-	if *appName == "" {
-		return conf, errors.New("Application name cannot be empty")
+	appName, err := env.GetAppName()
+	if err != nil {
+		return conf, err
 	}
+	conf.l.AppName = appName
 	log.SetConfig(conf.l)
 
 	// load redis config
 	redisConfig := redis.Config{}
-	err := config.ParseConfig(&redisConfig, *appName, "redis", directories...)
+	err = config.ParseConfig(&redisConfig, appName, "redis", directories...)
 	if err != nil {
 		return conf, err
 	}
