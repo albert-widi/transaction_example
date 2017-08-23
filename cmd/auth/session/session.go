@@ -17,8 +17,8 @@ import (
 
 // User session struct
 type User struct {
-	Admin  bool
-	UserID int64
+	Admin  bool  `json:"admin"`
+	UserID int64 `json:"user_id"`
 }
 
 const prefix = "hfdevtest:sess_id:"

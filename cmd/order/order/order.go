@@ -1,9 +1,11 @@
 package order
 
 import (
+	"context"
 	"database/sql"
 	"time"
 
+	"github.com/albert-widi/transaction_example/cmd/order/order/helper"
 	"github.com/albert-widi/transaction_example/cmd/order/repo"
 	"github.com/albert-widi/transaction_example/database"
 	"github.com/albert-widi/transaction_example/timeutil"
@@ -19,15 +21,15 @@ const (
 )
 
 type Order struct {
-	OrderID          int64             `json:"order_id,omitempty"`
-	UserID           int64             `json:"user_id,omitempty"`
-	ShippingID       sql.NullInt64     `json:"shipping_id,omitempty"`
-	VoucherID        sql.NullInt64     `json:"voucher_id,omitempty"`
-	PaymentConfirmed bool              `json:"payment_confirmed,omitempty"`
-	Total            sql.NullInt64     `json:"total"`
-	Status           OrderStatus       `json:"status,omitempty"`
-	CreatedAt        time.Time         `json:"created_at,omitempty"`
-	UpdatedAt        timeutil.NullTime `json:"updated_at"`
+	ID               int64             `database:"id"`
+	UserID           int64             `database:"user_id"`
+	ShippingID       sql.NullInt64     `database:"shipping_id"`
+	VoucherID        sql.NullInt64     `database:"voucher_id"`
+	PaymentConfirmed bool              `database:"payment_confirmed"`
+	Total            sql.NullInt64     `database:"total"`
+	Status           OrderStatus       `database:"status"`
+	CreatedAt        time.Time         `database:"created_at"`
+	UpdatedAt        timeutil.NullTime `database:"updated_at"`
 }
 
 const (
@@ -44,18 +46,28 @@ func FindActiveOrderByUserID(userID int64) (Order, error) {
 	return o, err
 }
 
-func AddOrder(userID, productID int64) error {
+func AddOrder(ctx context.Context, userID, productID int64) error {
+	// check product
+	prod, err := helper.FindProductByID(ctx, productID)
+	if err != nil {
+		return err
+	}
+
 	// check if an order is already created
 	o, err := FindActiveOrderByUserID(userID)
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	if o.OrderID != 0 {
-		// continue order
-	} else {
+	if o.ID == 0 {
 		// create new order
+		id, err := createOrder(userID)
+		if err != nil {
+			return err
+		}
+		o.ID = id
 	}
-	// check product
+	err = createOrderDetail(o.ID, prod.ID, prod.Price)
+	return err
 }
 
 const (

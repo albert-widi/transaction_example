@@ -33,6 +33,13 @@ func NewRequest(h HTTPAPI) (*http.Request, error) {
 	return defaultClient.NewRequest(h)
 }
 
+func GetDefaultCleint() (*Client, error) {
+	if defaultClient == nil {
+		errors.New("Default client is nil")
+	}
+	return defaultClient, nil
+}
+
 func doRequest(h HTTPAPI, ctxs ...context.Context) (*http.Response, error) {
 	if defaultClient == nil {
 		return nil, ErrDefaultClientIsNil

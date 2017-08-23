@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/albert-widi/transaction_example/cmd/order/order/helper"
+	"github.com/albert-widi/transaction_example/cmd/order/orderapi/middleware"
 	"github.com/albert-widi/transaction_example/errors"
 	"github.com/albert-widi/transaction_example/log"
 	"github.com/albert-widi/transaction_example/route"
@@ -26,6 +27,7 @@ func (api *APIV1) Register(r chi.Router) {
 		},
 	})
 	w.Get("/ping", w.Handle(ping))
+	w.Get("/test_auth", w.Handle(middleware.Authenticate(ping)))
 	w.Get("/test", w.Handle(testProd))
 }
 
