@@ -104,6 +104,7 @@ func decreaseStock(r *http.Request) (route.HandleObject, error) {
 	resp := new(route.V1)
 	productID, err := strconv.ParseInt(route.Param(r, "id"), 10, 64)
 	if err != nil {
+		log.Println("[decreaseStock] Params: ", route.Param(r, "id"))
 		resp.Message = "Invalid product_id"
 		return resp, errors.New(err)
 	}

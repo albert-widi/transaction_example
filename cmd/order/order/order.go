@@ -3,12 +3,12 @@ package order
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"time"
 
 	"github.com/albert-widi/transaction_example/cmd/order/order/helper"
 	"github.com/albert-widi/transaction_example/cmd/order/repo"
 	"github.com/albert-widi/transaction_example/database"
+	"github.com/albert-widi/transaction_example/errors"
 	"github.com/albert-widi/transaction_example/log"
 	"github.com/albert-widi/transaction_example/timeutil"
 )
@@ -16,10 +16,10 @@ import (
 type OrderStatus int
 
 const (
-	OrderStatusInit           OrderStatus = 10
-	OrderStatusCancelled      OrderStatus = 20
-	OrderStatusWaitingPayment OrderStatus = 25
-	OrderStatusFinished       OrderStatus = 30
+	OrderStatusInit           OrderStatus = 10 // order just created
+	OrderStatusWaitingPayment OrderStatus = 20 // order is submited
+	OrderStatusCancelled      OrderStatus = 29 // order is cancelled
+	OrderStatusFinished       OrderStatus = 30 // order is finished
 )
 
 type Order struct {
@@ -32,6 +32,27 @@ type Order struct {
 	Status           OrderStatus       `db:"status"`
 	CreatedAt        time.Time         `db:"created_at"`
 	UpdatedAt        timeutil.NullTime `db:"updated_at"`
+}
+
+func (o Order) IsSubmitable() error {
+	if o.Status > OrderStatusInit {
+		return errors.New("Order cannot be submited")
+	}
+	return nil
+}
+
+const (
+	findOrderByIDQuery = `
+		SELECT id, user_id, shipping_id, voucher_id, payment_confirmed, status, total, created_at, updated_at
+		FROM shop_order
+		WHERE id = $1
+	`
+)
+
+func FindOrderByID(orderID int64) (Order, error) {
+	o := Order{}
+	err := database.MustGet(repo.DatabaseTX).Get(&o, findOrderByIDQuery, orderID)
+	return o, err
 }
 
 const (
@@ -112,6 +133,22 @@ func AddOrder(ctx context.Context, add AddOrderModel) (int64, error) {
 }
 
 const (
+	updateOrderStatusQuery = `
+		UPDATE shop_order 
+		SET status = $1
+		WHERE id = $2
+	`
+)
+
+func (o Order) UpdateStatus(status OrderStatus) error {
+	if o.Status > status {
+		return errors.New("Cannot update order, current status is higher")
+	}
+	_, err := database.MustGet(repo.DatabaseTX).Exec(updateOrderStatusQuery, status, o.ID)
+	return err
+}
+
+const (
 	createOrderQuery = `INSERT INTO shop_order(user_id, status) VALUES($1,$2) RETURNING ID`
 )
 
@@ -137,4 +174,18 @@ const (
 func createOrderDetail(detail OrderDetail) error {
 	_, err := database.MustGet(repo.DatabaseTX).Exec(createOrderDetailQuery, detail.OrderID, detail.ProductID, detail.Amount, detail.Price, detail.Total)
 	return err
+}
+
+const (
+	findOrderDetailByOrderID = `
+		SELECT id, order_id, product_id, amount, price, total
+		FROM shop_order_detail
+		WHERE order_id = $1
+	`
+)
+
+func FindOrderDetailByOrderID(orderID int64) ([]OrderDetail, error) {
+	details := []OrderDetail{}
+	err := database.MustGet(repo.DatabaseTX).Select(&details, findOrderDetailByOrderID, orderID)
+	return details, err
 }

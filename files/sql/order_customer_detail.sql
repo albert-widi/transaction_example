@@ -4,7 +4,8 @@ CREATE TABLE order_customer_detail (
 	"order_id" int8 NOT NULL,
     "name" varchar(100) NOT NULL,
     "phone_number" varchar(100) NOT NULL,
-    "email_address" varchar(100) NOT NULL,
+    "email" varchar(100) NOT NULL,
+    "address" varchar(100) NOT NULL,
 	"created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
   	"updated_at" timestamp NULL, 
 	PRIMARY KEY ("id")

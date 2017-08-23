@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/albert-widi/transaction_example/cmd/order/order"
 	"github.com/albert-widi/transaction_example/cmd/order/order/helper"
@@ -36,6 +37,7 @@ func (api *APIV1) Register(r chi.Router) {
 
 	// all endpoints
 	w.Post("/order", w.Handle(middleware.Authenticate(createNewOrder)))
+	w.Put("/order/{id}/submit", w.Handle(middleware.Authenticate(submitOrder)))
 }
 
 func ping(r *http.Request) (route.HandleObject, error) {
@@ -86,5 +88,35 @@ func createNewOrder(r *http.Request) (route.HandleObject, error) {
 		return resp, err
 	}
 	resp.Data = map[string]interface{}{"order_id": orderID}
+	return resp, nil
+}
+
+// submitting new order
+// order can still be submitted by anyone and user id checking is required
+func submitOrder(r *http.Request) (route.HandleObject, error) {
+	resp := new(route.V1)
+	orderID, err := strconv.ParseInt(route.Param(r, "id"), 10, 64)
+	if err != nil {
+		resp.Message = "Invalid order_id"
+		return resp, errors.New(err)
+	}
+
+	content, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return resp, errors.New(err, http.StatusBadRequest, "Failed to read order request")
+	}
+
+	req := order.SubmitOrderModel{}
+	err = json.Unmarshal(content, &req)
+	if err != nil {
+		return resp, errors.New(err, http.StatusBadRequest, "Failed to read order request")
+	}
+	req.OrderID = orderID
+
+	err = order.SubmitOrder(r.Context(), req)
+	if err != nil {
+		return resp, err
+	}
+	resp.Message = "Order successfully submitted"
 	return resp, nil
 }

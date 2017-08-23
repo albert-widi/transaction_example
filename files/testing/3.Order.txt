@@ -26,3 +26,13 @@ curl -v --cookie "_SID_TXNAPP_=0c70ee48871ef1af1c2f4576ef83b01e" \
 <
 * Connection #0 to host localhost left intact
 {"data":{"order_id":1},"status":"OK"}
+
+-----------------------------------------------------------------------------------
+
+To submit the order, information about order_id, customer and voucher is needed.
+
+REQUEST:
+curl -v --cookie "_SID_TXNAPP_=0c70ee48871ef1af1c2f4576ef83b01e" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"albertwidi", "phone":"0813", "email":"albert@aw.com", "address":"villa", "voucher_code":"BELIBESOK"}' \
+  -X PUT 'localhost:9004/api/v1/order/1/submit'

@@ -26,3 +26,7 @@ func FindProductByID(ctx context.Context, productID int64) (Product, error) {
 	}
 	return prod, err
 }
+
+func DecreaseProductStock(ctx context.Context, productID, amount int64) error {
+	return apicalls.Product.DecreaseProductStock(ctx, productID, amount)
+}

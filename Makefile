@@ -3,6 +3,7 @@ build:
 	make build_product
 	make build_promo
 	make build_logistic
+	make build_order
 
 build_auth:
 	@echo " >> building auth service binary"
