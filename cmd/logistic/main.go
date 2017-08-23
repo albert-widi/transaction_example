@@ -5,7 +5,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/albert-widi/transaction_example/cmd/auth/authapi"
+	"github.com/albert-widi/transaction_example/cmd/logistic/logisticapi"
 	"github.com/albert-widi/transaction_example/database"
 	"github.com/albert-widi/transaction_example/log"
 	"github.com/albert-widi/transaction_example/service/httpapi"
@@ -26,7 +26,7 @@ func main() {
 	fatalChan := make(chan error)
 	w := httpapi.New(httpapi.Config{
 		ListenAddress:  ":9003",
-		RouteEndpoints: authapi.Endpoints,
+		RouteEndpoints: logisticapi.Endpoints,
 	})
 	go func() {
 		if err := w.Run(); err != nil {

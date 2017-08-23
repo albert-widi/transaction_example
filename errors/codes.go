@@ -23,6 +23,8 @@ const (
 	RedisKeyNotFound  // error because redis key not found
 
 	// product
+	ProductInvalidID     // product ID is invalid
+	ProductNotExists     // product is not exists
 	ProductStockEmpty    // error product stock empty
 	ProductInvalidAmount // invalid product amount
 
@@ -56,6 +58,10 @@ func (c Codes) GetErrorAndCode() (string, int) {
 		return "Redis key is not found", http.StatusBadRequest
 
 	// product
+	case ProductInvalidID:
+		return "Product ID is invalid", http.StatusBadRequest
+	case ProductNotExists:
+		return "Product isn ot exists", http.StatusNotFound
 	case ProductStockEmpty:
 		return "Product stock is empty", http.StatusBadRequest
 	case ProductInvalidAmount:

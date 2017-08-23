@@ -47,7 +47,7 @@ func (s Shipping) CanBeUpdated(status ShippingStatus) error {
 }
 
 const (
-	newShippingQuery = `INSERT INTO shipping(shipper_id, price, from, to, status) VALUES($1, $2, $3, $4, $5)`
+	newShippingQuery = `INSERT INTO shipping(shipper_id, price, from, to, status) VALUES($1, $2, $3, $4, $5) RETURNING ID`
 )
 
 func NewShipping(shippingObject Shipping) (int64, error) {

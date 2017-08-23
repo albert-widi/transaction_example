@@ -50,6 +50,14 @@ func GetProductList() ([]*Product, error) {
 	return p, nil
 }
 
+func GetProduct(productID int64) (*Product, error) {
+	p, ok := productList[productID]
+	if !ok {
+		return nil, errors.New(errors.ProductNotExists)
+	}
+	return p, nil
+}
+
 func DecreaseStock(productID int64, amount int) error {
 	prod := productList[productID]
 	prod.mutex.Lock()

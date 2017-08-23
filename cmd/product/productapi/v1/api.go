@@ -28,6 +28,7 @@ func (api *APIV1) Register(r chi.Router) {
 	})
 	w.Get("/ping", w.Handle(ping))
 	w.Get("/products", w.Handle(getProductList))
+	w.Get("/product/{id}", w.Handle(getProductByID))
 	w.Put("/product/{id}/increase", w.Handle(increaseStock))
 	w.Put("/product/{id}/decrease", w.Handle(decreaseStock))
 }
@@ -51,6 +52,22 @@ func getProductList(r *http.Request) (route.HandleObject, error) {
 	return resp, nil
 }
 
+func getProductByID(r *http.Request) (route.HandleObject, error) {
+	resp := new(route.V1)
+	productID, err := strconv.ParseInt(route.Param(r, "id"), 10, 64)
+	if err != nil {
+		return resp, errors.New(errors.ProductInvalidID)
+	}
+	p, err := product.GetProduct(productID)
+	if err != nil {
+		resp.Message = "Failed to get product"
+		return resp, errors.New(err)
+	}
+	resp.Data = p
+	return resp, nil
+}
+
+// helper function to get amount of product from request
 func productAmountFromReq(r *http.Request) (int, error) {
 	amount, err := strconv.Atoi(r.FormValue("amount"))
 	if err != nil {

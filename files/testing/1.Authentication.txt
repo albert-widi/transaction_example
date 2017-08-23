@@ -43,3 +43,28 @@ RESPONSE:
 <
 * Connection #0 to host localhost left intact
 
+-----------------------------------------------------------------------------------
+
+To try to authenticate with existing cookie:
+
+REQUEST:
+curl -v --cookie "_SID_TXNAPP_=6a260fd0429ab7fd6c50b222b067f124" \
+localhost:9000/api/v1/auth
+
+RESPONSE:
+> localhost:9000/api/v1/auth
+*   Trying ::1...
+* Connected to localhost (::1) port 9000 (#0)
+> GET /api/v1/auth HTTP/1.1
+> Host: localhost:9000
+> User-Agent: curl/7.49.1
+> Accept: */*
+> Cookie: _SID_TXNAPP_=6a260fd0429ab7fd6c50b222b067f124
+>
+< HTTP/1.1 200 OK
+< Content-Type: application/json
+< Date: Mon, 21 Aug 2017 16:41:17 GMT
+< Content-Length: 57
+<
+* Connection #0 to host localhost left intact
+{"data":{"Admin":true,"UserID":1503333435},"status":"OK"}

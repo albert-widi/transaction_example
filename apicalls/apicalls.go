@@ -7,6 +7,7 @@ import (
 
 // Config of apicalls
 type Config struct {
+	Auth     authConfig
 	Logistic logsiticConfig
 	Product  productConfig
 	Promo    promoConfig
@@ -14,8 +15,9 @@ type Config struct {
 
 // api list
 var (
+	Auth     *authAPI
 	Logistic *LogisticAPI
-	Product  *ProductAPI
+	Product  *productAPI
 	Promo    *PromoAPI
 )
 
@@ -34,6 +36,7 @@ func New(conf Config) error {
 		return err
 	}
 	// list of available API
+	Auth = newAuth(conf.Auth)
 	Logistic = newLogistic(conf.Logistic)
 	Product = newProduct(conf.Product)
 	Promo = newPromo(conf.Promo)

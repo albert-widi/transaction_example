@@ -16,7 +16,10 @@ func ParseConfig(cfg interface{}, appName, module string, path ...string) error 
 func readModuleConfig(cfg interface{}, appName, env, module string, path ...string) error {
 	var err error
 	for _, val := range path {
-		fname := val + "/" + appName + "/" + module + "." + env + ".ini"
+		if appName != "" {
+			val += "/" + appName
+		}
+		fname := val + "/" + module + "." + env + ".ini"
 		err = gcfg.ReadFileInto(cfg, fname)
 		if err == nil {
 			break

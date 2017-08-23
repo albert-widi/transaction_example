@@ -35,3 +35,11 @@ build_logistic:
 start_logistic:
 	@echo " >> starting logistic service"
 	@TXAPPNAME=logisticapp ./logisticapp -log_level=debug
+
+build_order:
+	@echo " >> building order service binary"
+	@go build -o orderapp cmd/order/*.go
+
+start_order:
+	@echo " >> starting order service"
+	@TXAPPNAME=orderapp ./orderapp -log_level=debug

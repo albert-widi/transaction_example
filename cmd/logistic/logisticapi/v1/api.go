@@ -3,7 +3,6 @@ package v1
 import (
 	"net/http"
 
-	"github.com/albert-widi/transaction_example/cmd/promo/voucher"
 	"github.com/albert-widi/transaction_example/errors"
 	"github.com/albert-widi/transaction_example/log"
 	"github.com/albert-widi/transaction_example/route"
@@ -26,8 +25,6 @@ func (api *APIV1) Register(r chi.Router) {
 		},
 	})
 	w.Get("/ping", w.Handle(ping))
-	w.Get("/promo/voucher/validate", w.Handle(validateVoucher))
-	w.Get("/promo/voucher/check", w.Handle(checkVoucher))
 }
 
 func ping(r *http.Request) (route.HandleObject, error) {
@@ -36,26 +33,4 @@ func ping(r *http.Request) (route.HandleObject, error) {
 		"data": "This is data",
 	}
 	return resp, errors.DatabaseTypeNotExists.Err()
-}
-
-func validateVoucher(r *http.Request) (route.HandleObject, error) {
-	resp := new(route.V1)
-	code := r.FormValue("code")
-	err := voucher.ValidateVoucher(code)
-	if err != nil {
-		return resp, errors.New(err)
-	}
-	resp.Message = "Voucher vaidated"
-	return resp, nil
-}
-
-func checkVoucher(r *http.Request) (route.HandleObject, error) {
-	resp := new(route.V1)
-	code := r.FormValue("code")
-	v, err := voucher.GetVoucherByCode(code, voucher.Validate)
-	if err != nil {
-		return resp, errors.New(err)
-	}
-	resp.Data = v
-	return resp, nil
 }
