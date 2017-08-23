@@ -22,7 +22,7 @@ Simple architecture:
 
 Image: `/files/simple_architecture.png`
 
-![Alt text](./files/simple_architecture.png?raw=true "Simple Architecture")
+![Simple Architecture](./files/simple_architecture.png?raw=true "Simple Architecture")
 
 ## Repo/Code Design 
 
