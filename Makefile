@@ -12,7 +12,7 @@ build:
 run:
 	@docker-compose up -d
 	@echo " >> waiting postgresql to be ready"
-	@sleep 4
+	@sleep 3
 	@TXAPPNAME=authapp  ./authapp -log_level=debug & > authapp.out
 	@TXAPPNAME=productapp ./productapp -appname=productapp -log_level=debug & > productapp.out
 	@TXAPPNAME=promoapp ./promoapp -log_level=debug & > promoapp.out
@@ -28,6 +28,13 @@ stop:
 	@pkill orderapp
 	@docker-compose down
 	@echo " >> all services stop"
+
+check:
+	@pgrep authapp
+	@pgrep productapp
+	@pgrep promoapp
+	@pgrep logisticapp
+	@pgrep orderapp
 
 build_auth:
 	@echo " >> building auth service binary"
