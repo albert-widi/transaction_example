@@ -21,7 +21,7 @@ type User struct {
 	UserID int64 `json:"user_id"`
 }
 
-const prefix = "hfdevtest:sess_id:"
+const prefix = "txnapp:sess_id:"
 
 func SetSessionAndCookie(w *http.ResponseWriter, userObj User) error {
 	log.Debug("SetSessionAndCookie")

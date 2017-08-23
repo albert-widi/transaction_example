@@ -19,14 +19,14 @@ const (
 )
 
 type Shipping struct {
-	ID        int64             `database:"id"`
-	ShipperID int64             `database:"shipper_id"`
-	Price     int64             `database:"price"`
-	Status    ShippingStatus    `database:"status"`
-	From      string            `database:"from"`
-	To        string            `database:"to"`
-	CreatedAt time.Time         `database:"created_at"`
-	UpdatedAt timeutil.NullTime `database:"updated_at"`
+	ID        int64             `db:"id"`
+	ShipperID int64             `db:"shipper_id"`
+	Price     int64             `db:"price"`
+	Status    ShippingStatus    `db:"status"`
+	From      string            `db:"from"`
+	To        string            `db:"to"`
+	CreatedAt time.Time         `db:"created_at"`
+	UpdatedAt timeutil.NullTime `db:"updated_at"`
 }
 
 func (s Shipping) Validate() error {

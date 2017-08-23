@@ -3,11 +3,13 @@ package order
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/albert-widi/transaction_example/cmd/order/order/helper"
 	"github.com/albert-widi/transaction_example/cmd/order/repo"
 	"github.com/albert-widi/transaction_example/database"
+	"github.com/albert-widi/transaction_example/log"
 	"github.com/albert-widi/transaction_example/timeutil"
 )
 
@@ -21,20 +23,20 @@ const (
 )
 
 type Order struct {
-	ID               int64             `database:"id"`
-	UserID           int64             `database:"user_id"`
-	ShippingID       sql.NullInt64     `database:"shipping_id"`
-	VoucherID        sql.NullInt64     `database:"voucher_id"`
-	PaymentConfirmed bool              `database:"payment_confirmed"`
-	Total            sql.NullInt64     `database:"total"`
-	Status           OrderStatus       `database:"status"`
-	CreatedAt        time.Time         `database:"created_at"`
-	UpdatedAt        timeutil.NullTime `database:"updated_at"`
+	ID               int64             `db:"id"`
+	UserID           int64             `db:"user_id"`
+	ShippingID       sql.NullInt64     `db:"shipping_id"`
+	VoucherID        sql.NullInt64     `db:"voucher_id"`
+	PaymentConfirmed sql.NullInt64     `db:"payment_confirmed"`
+	Total            sql.NullInt64     `db:"total"`
+	Status           OrderStatus       `db:"status"`
+	CreatedAt        time.Time         `db:"created_at"`
+	UpdatedAt        timeutil.NullTime `db:"updated_at"`
 }
 
 const (
 	findActiveOrderByUserIDQuery = `
-		SELECT order_id, user_id, shipping_id, voucher_id, payment_confirmed, status, created_at, updated_at
+		SELECT id, user_id, shipping_id, voucher_id, payment_confirmed, status, total, created_at, updated_at
 		FROM shop_order
 		WHERE user_id = $1 AND status = $2
 	`
@@ -43,31 +45,70 @@ const (
 func FindActiveOrderByUserID(userID int64) (Order, error) {
 	o := Order{}
 	err := database.MustGet(repo.DatabaseTX).Get(&o, findActiveOrderByUserIDQuery, userID, OrderStatusInit)
+	if err != nil {
+		log.Debug("[FindActiveOrderByUserID] Failed to get data: ", err.Error())
+	}
 	return o, err
 }
 
-func AddOrder(ctx context.Context, userID, productID int64) error {
-	// check product
-	prod, err := helper.FindProductByID(ctx, productID)
+// AddOrder struct
+type AddOrderModel struct {
+	UserID    int64
+	ProductID int64 `json:"product_id"`
+	Amount    int64 `json:"amount"`
+}
+
+func (a AddOrderModel) Validate() error {
+	if a.UserID == 0 {
+		return errors.New("UserID cannot be empty")
+	}
+
+	if a.ProductID == 0 {
+		return errors.New("ProductID cannot be 0")
+	}
+
+	if a.Amount == 0 {
+		return errors.New("Product amount cannot be 0")
+	} else if a.Amount > 10 {
+		return errors.New("Max amount of order is 10")
+	}
+	return nil
+}
+
+func AddOrder(ctx context.Context, add AddOrderModel) (int64, error) {
+	err := add.Validate()
 	if err != nil {
-		return err
+		return 0, err
+	}
+
+	// check product
+	prod, err := helper.FindProductByID(ctx, add.ProductID)
+	if err != nil {
+		return 0, err
 	}
 
 	// check if an order is already created
-	o, err := FindActiveOrderByUserID(userID)
+	o, err := FindActiveOrderByUserID(add.UserID)
 	if err != nil && err != sql.ErrNoRows {
-		return err
+		return 0, err
 	}
 	if o.ID == 0 {
 		// create new order
-		id, err := createOrder(userID)
+		id, err := createOrder(add.UserID)
 		if err != nil {
-			return err
+			return 0, err
 		}
 		o.ID = id
 	}
-	err = createOrderDetail(o.ID, prod.ID, prod.Price)
-	return err
+	detail := OrderDetail{
+		OrderID:   o.ID,
+		ProductID: add.ProductID,
+		Amount:    add.Amount,
+		Price:     prod.Price,
+		Total:     prod.Price * add.Amount,
+	}
+	err = createOrderDetail(detail)
+	return o.ID, err
 }
 
 const (
@@ -80,15 +121,20 @@ func createOrder(userID int64) (int64, error) {
 	return orderID, err
 }
 
-const (
-	createOrderDetailQuery = `INSERTINTO shop_order_detail(product_id, price) VALUES($1, $2, $3)`
-)
-
-func createOrderDetail(orderID, productID, productPrice int64) error {
-	_, err := database.MustGet(repo.DatabaseTX).Exec(createOrderDetailQuery, orderID, productID, productPrice)
-	return err
+type OrderDetail struct {
+	ID        int64 `db:"id"`
+	OrderID   int64 `db:"order_id"`
+	ProductID int64 `db:"product_id"`
+	Amount    int64 `db:"amount"`
+	Price     int64 `db:"price"`
+	Total     int64 `db:"total"`
 }
 
-func ConfirmOrder(orderID int64) {
+const (
+	createOrderDetailQuery = `INSERT INTO shop_order_detail(order_id, product_id, amount, price, total) VALUES($1, $2, $3, $4, $5)`
+)
 
+func createOrderDetail(detail OrderDetail) error {
+	_, err := database.MustGet(repo.DatabaseTX).Exec(createOrderDetailQuery, detail.OrderID, detail.ProductID, detail.Amount, detail.Price, detail.Total)
+	return err
 }

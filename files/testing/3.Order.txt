@@ -1,0 +1,28 @@
+To create new order you need to be authenticated as user first, then you can do a request like this:
+
+REQUEST:
+curl -v --cookie "_SID_TXNAPP_=0c70ee48871ef1af1c2f4576ef83b01e" \
+  -H "Content-Type: application/json" \
+  -d '{"product_id": 1, "amount":2}' \
+  -X POST 'localhost:9004/api/v1/order'
+
+  RESPONSE:
+  Note: Unnecessary use of -X or --request, POST is already inferred.
+*   Trying ::1...
+* Connected to localhost (::1) port 9004 (#0)
+> POST /api/v1/order HTTP/1.1
+> Host: localhost:9004
+> User-Agent: curl/7.49.1
+> Accept: */*
+> Cookie: _SID_TXNAPP_=0c70ee48871ef1af1c2f4576ef83b01e
+> Content-Type: application/json
+> Content-Length: 29
+>
+* upload completely sent off: 29 out of 29 bytes
+< HTTP/1.1 200 OK
+< Content-Type: application/json
+< Date: Wed, 23 Aug 2017 13:17:13 GMT
+< Content-Length: 37
+<
+* Connection #0 to host localhost left intact
+{"data":{"order_id":1},"status":"OK"}

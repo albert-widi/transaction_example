@@ -16,6 +16,8 @@ services:
         restart: unless-stopped
         ports:
             - "5432:5432"
+        volumes:
+            - ./files/init.sql:/docker-entrypoint-initdb.d/init.sql
         environment:
             LC_ALL: C.UTF-8
             POSTGRES_USER: txapp

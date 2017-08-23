@@ -40,3 +40,31 @@ func Authenticate(h route.Handle) route.Handle {
 		return h(r)
 	}
 }
+
+// AuthenticateV1 for V1 authentication
+func MustAdmin(h route.Handle) route.Handle {
+	return func(r *http.Request) (route.HandleObject, error) {
+		v1reponse := new(route.V1)
+		usr, err := GetUser(r)
+		if err != nil {
+			return v1reponse, err
+		}
+		if !usr.Admin {
+			return v1reponse, errors.New("User is not admin")
+		}
+		return h(r)
+	}
+}
+
+func GetUser(r *http.Request) (User, error) {
+	u := User{}
+	c := r.Context().Value("user")
+	if c == nil {
+		return u, errors.New("User not detected")
+	}
+	u = c.(User)
+	if u.UserID == 0 {
+		return u, errors.New("User not detected")
+	}
+	return u, nil
+}
