@@ -1,9 +1,33 @@
+must_build:
+	@go get -u
+	make build
+
 build:
 	make build_auth
 	make build_product
 	make build_promo
 	make build_logistic
 	make build_order
+
+run:
+	@docker-compose up -d
+	@echo " >> waiting postgresql to be ready"
+	@sleep 4
+	@TXAPPNAME=authapp  ./authapp -log_level=debug & > authapp.out
+	@TXAPPNAME=productapp ./productapp -appname=productapp -log_level=debug & > productapp.out
+	@TXAPPNAME=promoapp ./promoapp -log_level=debug & > promoapp.out
+	@TXAPPNAME=logisticapp ./logisticapp -log_level=debug & > logisticapp.out
+	@TXAPPNAME=orderapp ./orderapp -log_level=debug & > orderapp.out
+	@echo " >> all services is running"
+
+stop:
+	@pkill authapp
+	@pkill productapp
+	@pkill promoapp
+	@pkill logisticapp
+	@pkill orderapp
+	@docker-compose down
+	@echo " >> all services stop"
 
 build_auth:
 	@echo " >> building auth service binary"

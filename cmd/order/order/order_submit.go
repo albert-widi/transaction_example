@@ -68,7 +68,7 @@ func SubmitOrder(ctx context.Context, model SubmitOrderModel) error {
 	}
 	err = CreateOrderCustomerDetail(customerDetail)
 	if err != nil {
-
+		log.Debugf("[SubmitOrder] Failed to create order customer detail: ", err.Error())
 	}
 	return err
 }

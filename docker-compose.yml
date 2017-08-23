@@ -1,16 +1,5 @@
 version: '2'
 services:
-
-    # go:
-    #     image: txapp:latest
-    #     ports:
-    #         - "9300:9300"
-    #     links:
-    #         - postgres
-    #         - redis
-    #     environment:
-    #         TXENV: 'dev'
-
     postgres:
         image: onjin/alpine-postgres:9.5
         restart: unless-stopped

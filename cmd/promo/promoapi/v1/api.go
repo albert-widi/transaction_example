@@ -52,6 +52,7 @@ func validateVoucher(r *http.Request) (route.HandleObject, error) {
 func checkVoucher(r *http.Request) (route.HandleObject, error) {
 	resp := new(route.V1)
 	code := r.FormValue("code")
+	log.Debug("[CheckVoucher] Code: ", code)
 	v, err := voucher.GetVoucherByCode(code, voucher.Validate)
 	if err != nil {
 		return resp, errors.New(err)

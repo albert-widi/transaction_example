@@ -39,5 +39,5 @@ func main() {
 	case err := <-fatalChan:
 		log.Fatal("Application failed to run because ", err.Error())
 	}
-	log.Warn("Transactionapp exited...")
+	log.Warn("Authapp exited...")
 }

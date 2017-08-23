@@ -1,0 +1,5 @@
+FROM golang:1.8.3
+WORKDIR /go/src/github.com/albert-widi/transaction_example
+COPY . ./
+RUN GOOS=linux go build -o orderapp cmd/order/*.go
+CMD [ "./orderapp" ]

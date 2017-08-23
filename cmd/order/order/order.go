@@ -16,10 +16,12 @@ import (
 type OrderStatus int
 
 const (
-	OrderStatusInit           OrderStatus = 10 // order just created
-	OrderStatusWaitingPayment OrderStatus = 20 // order is submited
-	OrderStatusCancelled      OrderStatus = 29 // order is cancelled
-	OrderStatusFinished       OrderStatus = 30 // order is finished
+	OrderStatusInit                OrderStatus = 10 // order just created
+	OrderStatusWaitingPayment      OrderStatus = 20 // order is submited
+	OrderStatusWaitingAdminConfirm OrderStatus = 21 // order is waiting for admin confirmation
+	OrderStatusInDelivery          OrderStatus = 25 // order is in delivery
+	OrderStatusCancelled           OrderStatus = 29 // order is cancelled
+	OrderStatusFinished            OrderStatus = 30 // order is finished
 )
 
 type Order struct {
